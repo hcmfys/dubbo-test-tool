@@ -1,6 +1,9 @@
 package org.springbus.gui;
 
 
+import com.alibaba.fastjson.JSON;
+import com.github.jsonzou.jmockdata.JMockData;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.net.InetSocketAddress;
@@ -157,16 +160,8 @@ public class DubboCmd {
                     for (int i = 0; i < size; i++) {
                         Parameter p = parameterTypes[i];
                         Object ct = JMockData.mock(p.getType());
-                        if(ct instanceof Pagination) {
-                            Pagination c=(Pagination)ct;
-                            c.setOrderField("");
-                            c.setCurrentPage(1);
-                            c.setOrderType("");
-                            c.setTotalCount(10);
-                            c.setPageSize(20);
 
-                        }
-                        sb.add(JsonUtil.toPrettyJsonString(ct));
+                        sb.add(JSON.toJSONString(ct,true));
                         methodSb.add(p.getType().getSimpleName() + " " + p.getName());
                     }
 
@@ -191,7 +186,7 @@ public class DubboCmd {
         String t = DubboCmd.executeCmd("ls -l", host, 21910);
         System.out.println(t);
         Map<String, List<String>> map = parseMethodList(t);
-        System.out.println(JsonUtil.toJsonString(map));
+        System.out.println(JSON.toJSONString(map));
 
         //t = DubboCmd.executeCmd("invoke com.evergrande.decorate.cms.service.ArticleCategoryService.getDetails(1)", host, 21910);
         //System.out.println(t);

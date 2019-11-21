@@ -2,9 +2,8 @@ package org.springbus.gui;
 
 
 import com.alibaba.fastjson.JSON;
-
+import com.github.jsonzou.jmockdata.util.StringUtils;
 import com.jgoodies.looks.plastic.PlasticLookAndFeel;
-
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
@@ -17,6 +16,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.Map;
+
+import static org.springbus.gui.DubboCmd.parseMethod;
+import static org.springbus.gui.TreeModelUtil.explorerTree;
 
 
 public class DubboGUI  extends JFrame {
@@ -184,7 +186,7 @@ public class DubboGUI  extends JFrame {
                     msg = ret.substring(0, index);
                     time = ret.substring(index);
                     try {
-                        msg = JsonUtil.toPrettyJsonString(JSON.parse(msg));
+                        msg = JSON.toJSONString(JSON.parse(msg),true);
                         explorerTree(JSON.parse(msg), rootNode);
                         tree.updateUI();
                         tree.expandPath(tree.getSelectionPath());
