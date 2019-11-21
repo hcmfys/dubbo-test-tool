@@ -1,7 +1,7 @@
 # dubbo-test-tool
 dubbo服务测试工具
 
-mport java.io.IOException;
+import java.io.IOException;
 
 public class APIService {
 
