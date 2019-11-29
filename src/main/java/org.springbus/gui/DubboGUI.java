@@ -194,10 +194,16 @@ public class DubboGUI  extends JFrame {
         }));
 
         btDecompile.addActionListener(e -> {
-            PlainTextOutput plt=new PlainTextOutput();
-            String tClass=txtClass.getText();
-            Decompiler.decompile(tClass,plt);
-            codeArea.setText(plt.toString());
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    PlainTextOutput plt=new PlainTextOutput();
+                    String tClass=txtClass.getText();
+                    Decompiler.decompile(tClass,plt);
+                    codeArea.setText(plt.toString());
+                }
+            });
+
         });
         serverList.addItemListener(this::serverChanged);
 
