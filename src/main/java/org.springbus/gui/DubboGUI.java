@@ -159,6 +159,7 @@ public class DubboGUI  extends JFrame {
         codePanel.add(serverName);
         JTextField  txtClass = new JTextField();
         txtClass.setPreferredSize(new Dimension(400, 30));
+        txtClass.setText("java.lang.String");
         codePanel.add(txtClass);
 
         JButton btDecompile = new JButton("反编译");
