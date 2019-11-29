@@ -4,6 +4,8 @@ package org.springbus.gui;
 import com.alibaba.fastjson.JSON;
 import com.github.jsonzou.jmockdata.util.StringUtils;
 import com.jgoodies.looks.plastic.PlasticLookAndFeel;
+import com.strobel.decompiler.Decompiler;
+import com.strobel.decompiler.PlainTextOutput;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
@@ -11,9 +13,7 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.util.List;
 import java.util.Map;
 
@@ -146,8 +146,36 @@ public class DubboGUI  extends JFrame {
 
         mainPanel.add(contentPanel, BorderLayout.CENTER);
 
+        JTabbedPane sysPanel=new JTabbedPane();
+        sysPanel.addTab("测试平台",mainPanel);
 
-        this.setContentPane(mainPanel);
+
+        JPanel codePanel=new JPanel();
+
+
+        JLabel labelClassName = new JLabel("请输入类名称:");
+        labelClassName.setHorizontalAlignment(SwingConstants.RIGHT);
+        labelClassName.setPreferredSize(new Dimension(40, 30));
+        codePanel.add(serverName);
+        JTextField  txtClass = new JTextField();
+        txtClass.setPreferredSize(new Dimension(400, 30));
+        codePanel.add(txtClass);
+
+        JButton btDecompile = new JButton("反编译");
+        btDecompile.setPreferredSize(new Dimension(200, 30));
+        codePanel.add(btDecompile);
+
+        JPanel codeContentPanel=new JPanel();
+        codeContentPanel.setLayout(new BorderLayout());
+        codeContentPanel.add(codePanel,BorderLayout.NORTH);
+        RSyntaxTextArea  codeArea=new RSyntaxTextArea();
+        codeArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
+        codeArea.setCodeFoldingEnabled(true);
+        codeContentPanel.add(new RTextScrollPane(codeArea),BorderLayout.CENTER);
+
+        sysPanel.addTab("编译平台",codeContentPanel);
+
+        this.setContentPane(sysPanel);
         this.setSize(1200, 800);
         this.setTitle("Dubbo Service 测试平台");
 
@@ -163,6 +191,13 @@ public class DubboGUI  extends JFrame {
                 JOptionPane.showMessageDialog(DubboGUI.this, "获取接口错误，请检查端口是否正确，服务是否开启！");
             }
         }));
+
+        btDecompile.addActionListener(e -> {
+            PlainTextOutput plt=new PlainTextOutput();
+            String tClass=txtClass.getText();
+            Decompiler.decompile(tClass,plt);
+            codeArea.setText(plt.toString());
+        });
         serverList.addItemListener(this::serverChanged);
 
         methodList.addItemListener(this::methodStateChanged);
@@ -235,7 +270,7 @@ public class DubboGUI  extends JFrame {
 
     public static void main(String[] args) throws Exception {
 
-      new DubboGUI("127.0.0.1",1921);
+      new DubboGUI("127.0.0.1",12345);
     }
 
 
