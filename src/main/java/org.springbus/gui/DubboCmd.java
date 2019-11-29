@@ -4,6 +4,7 @@ package org.springbus.gui;
 import com.alibaba.fastjson.JSON;
 import com.github.jsonzou.jmockdata.JMockData;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.net.InetSocketAddress;
@@ -180,8 +181,8 @@ public class DubboCmd {
 
 
 
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException {
+/*
         String host = "172.18.109.9";
         String t = DubboCmd.executeCmd("ls -l", host, 21910);
         System.out.println(t);
@@ -191,6 +192,15 @@ public class DubboCmd {
         //t = DubboCmd.executeCmd("invoke com.evergrande.decorate.cms.service.ArticleCategoryService.getDetails(1)", host, 21910);
         //System.out.println(t);
         new DubboGUI("192.168.56.2",21902);
+
+*/
+        Field f = ClassLoader.class.getDeclaredField("classes");
+        f.setAccessible(true);
+        Vector v = (Vector) f.get(Thread.currentThread().getContextClassLoader());
+
+        for (Object o : v) {
+            System.out.println(o);
+        }
 
     }
 }

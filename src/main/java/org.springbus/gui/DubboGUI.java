@@ -14,8 +14,10 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.awt.event.*;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import static org.springbus.gui.DubboCmd.parseMethod;
 import static org.springbus.gui.TreeModelUtil.explorerTree;
@@ -31,7 +33,6 @@ public class DubboGUI  extends JFrame {
     private Map<String, List<String>> mapList;
 
 
-
     private JComboBox serverList;
 
     private JComboBox methodList;
@@ -40,11 +41,11 @@ public class DubboGUI  extends JFrame {
 
     private JLabel contentLabel;
 
-    private  DefaultMutableTreeNode rootNode;
+    private DefaultMutableTreeNode rootNode;
 
     private String[] dataList;
 
-    public DubboGUI(String host,int port) {
+    public DubboGUI(String host, int port) {
         try {
             UIManager.setLookAndFeel(new PlasticLookAndFeel());
         } catch (UnsupportedLookAndFeelException e) {
@@ -146,35 +147,46 @@ public class DubboGUI  extends JFrame {
 
         mainPanel.add(contentPanel, BorderLayout.CENTER);
 
-        JTabbedPane sysPanel=new JTabbedPane();
-        sysPanel.addTab("测试平台",mainPanel);
+        JTabbedPane sysPanel = new JTabbedPane();
+        sysPanel.addTab("测试平台", mainPanel);
 
 
-        JPanel codePanel=new JPanel();
+        JPanel codePanel = new JPanel();
 
+
+        JLabel labelLoad = new JLabel("已经加载的类:");
+        labelLoad.setHorizontalAlignment(SwingConstants.RIGHT);
+        labelLoad.setPreferredSize(new Dimension(100, 30));
+        codePanel.add(labelLoad);
+
+
+        JComboBox txtLoadCLass = new JComboBox<>();
+        txtLoadCLass.setPreferredSize(new Dimension(400, 30));
+        codePanel.add(txtLoadCLass);
 
         JLabel labelClassName = new JLabel("请输入类名称:");
         labelClassName.setHorizontalAlignment(SwingConstants.RIGHT);
-        labelClassName.setPreferredSize(new Dimension(40, 30));
-        codePanel.add(serverName);
-        JTextField  txtClass = new JTextField();
+        labelClassName.setPreferredSize(new Dimension(100, 30));
+        codePanel.add(labelClassName);
+
+        JTextField txtClass = new JTextField();
         txtClass.setPreferredSize(new Dimension(400, 30));
         txtClass.setText("java.lang.String");
         codePanel.add(txtClass);
 
         JButton btDecompile = new JButton("反编译");
-        btDecompile.setPreferredSize(new Dimension(200, 30));
+        btDecompile.setPreferredSize(new Dimension(100, 30));
         codePanel.add(btDecompile);
 
-        JPanel codeContentPanel=new JPanel();
+        JPanel codeContentPanel = new JPanel();
         codeContentPanel.setLayout(new BorderLayout());
-        codeContentPanel.add(codePanel,BorderLayout.NORTH);
-        RSyntaxTextArea  codeArea=new RSyntaxTextArea();
+        codeContentPanel.add(codePanel, BorderLayout.NORTH);
+        RSyntaxTextArea codeArea = new RSyntaxTextArea();
         codeArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
         codeArea.setCodeFoldingEnabled(true);
-        codeContentPanel.add(new RTextScrollPane(codeArea),BorderLayout.CENTER);
+        codeContentPanel.add(new RTextScrollPane(codeArea), BorderLayout.CENTER);
 
-        sysPanel.addTab("编译平台",codeContentPanel);
+        sysPanel.addTab("编译平台", codeContentPanel);
 
         this.setContentPane(sysPanel);
         this.setSize(1200, 800);
@@ -197,9 +209,9 @@ public class DubboGUI  extends JFrame {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    PlainTextOutput plt=new PlainTextOutput();
-                    String tClass=txtClass.getText();
-                    Decompiler.decompile(tClass,plt);
+                    PlainTextOutput plt = new PlainTextOutput();
+                    String tClass = txtClass.getText();
+                    Decompiler.decompile(tClass, plt);
                     codeArea.setText(plt.toString());
                 }
             });
@@ -228,7 +240,7 @@ public class DubboGUI  extends JFrame {
                     msg = ret.substring(0, index);
                     time = ret.substring(index);
                     try {
-                        msg = JSON.toJSONString(JSON.parse(msg),true);
+                        msg = JSON.toJSONString(JSON.parse(msg), true);
                         explorerTree(JSON.parse(msg), rootNode);
                         tree.updateUI();
                         tree.expandPath(tree.getSelectionPath());
@@ -259,6 +271,29 @@ public class DubboGUI  extends JFrame {
         });
 
 
+        try {
+            Field f = null;
+            f = ClassLoader.class.getDeclaredField("classes");
+            f.setAccessible(true);
+            Vector v = (Vector) f.get(Thread.currentThread().getContextClassLoader());
+
+            for (Object o : v) {
+                String className = o.toString().replace("class ", "").trim();
+                txtLoadCLass.addItem(className);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        txtLoadCLass.addItemListener(e -> {
+            String clasName = txtLoadCLass.getSelectedItem().toString();
+            PlainTextOutput plt = new PlainTextOutput();
+            Decompiler.decompile(clasName, plt);
+            codeArea.setText(plt.toString());
+        });
+
+
     }
 
     private void loadMockData() {
@@ -277,19 +312,19 @@ public class DubboGUI  extends JFrame {
 
     public static void main(String[] args) throws Exception {
 
-      new DubboGUI("127.0.0.1",12345);
+        new DubboGUI("127.0.0.1", 12345);
     }
 
 
-    private void methodStateChanged (ItemEvent e) {
+    private void methodStateChanged(ItemEvent e) {
         SwingUtilities.invokeLater(() -> {
             loadMockData();
         });
     }
 
-    private void  serverChanged (ItemEvent e) {
+    private void serverChanged(ItemEvent e) {
         SwingUtilities.invokeLater(() -> {
-            String item = dataList[ serverList.getSelectedIndex()];
+            String item = dataList[serverList.getSelectedIndex()];
             List<String> list = mapList.get(item);
             methodList.setModel(new ServerModel(list));
             methodList.setSelectedIndex(0);
