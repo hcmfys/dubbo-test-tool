@@ -3,18 +3,6 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>org.springbus</artifactId>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>8</source>
-                    <target>8</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
     <groupId>dubbo-test-tool</groupId>
     <version>1.2.3-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -23,14 +11,9 @@
     <url>http://maven.apache.org</url>
 
     <properties>
-
         <springfox-swagger.version>2.9.2</springfox-swagger.version>
     </properties>
-
     <dependencies>
-
-
-
 
         <dependency>
             <groupId>com.github.jsonzou</groupId>
@@ -45,7 +28,6 @@
             <artifactId>rsyntaxtextarea</artifactId>
             <version>3.0.4</version>
         </dependency>
-
 
         <!-- https://mvnrepository.com/artifact/com.jgoodies/looks -->
         <dependency>
@@ -83,7 +65,51 @@
             <version>0.5.36</version>
         </dependency>
 
+        <dependency>
+          <groupId>org.javassist</groupId>
+          <artifactId>javassist</artifactId>
+          <version>3.26.0-GA</version>
+        </dependency>
+
     </dependencies>
 
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
+            </plugin>
+
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                        <manifestEntries>
+                            <Premain-Class>
+                                org.springbus.dump.DumpClassAgent
+                            </Premain-Class>
+                            <Can-Redefine-Classes>true</Can-Redefine-Classes>
+                            <Boot-Class-Path>../javassist-3.26.0-GA.jar</Boot-Class-Path>
+                        </manifestEntries>
+                    </archive>
+
+
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
 
 </project>
