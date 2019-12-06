@@ -4,8 +4,15 @@ package org.springbus.gui;
 import com.alibaba.fastjson.JSON;
 import com.github.jsonzou.jmockdata.util.StringUtils;
 import com.jgoodies.looks.plastic.PlasticLookAndFeel;
+import com.strobel.assembler.InputTypeLoader;
+import com.strobel.assembler.metadata.ClasspathTypeLoader;
+import com.strobel.assembler.metadata.CompositeTypeLoader;
 import com.strobel.decompiler.Decompiler;
+import com.strobel.decompiler.DecompilerSettings;
 import com.strobel.decompiler.PlainTextOutput;
+
+
+
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
@@ -13,7 +20,9 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +54,11 @@ public class DubboGUI  extends JFrame {
 
     private String[] dataList;
 
+
+    private CompositeTypeLoader  compositeTypeLoader=new CompositeTypeLoader(new ClasspathTypeLoader(),new InputTypeLoader());
+    private  DecompilerSettings settings=   new DecompilerSettings();
+
+
     public DubboGUI(String host, int port) {
         try {
             UIManager.setLookAndFeel(new PlasticLookAndFeel());
@@ -54,6 +68,8 @@ public class DubboGUI  extends JFrame {
 
         this.port = port;
         this.host = host;
+
+        settings.setTypeLoader(compositeTypeLoader);
         init();
         setVisible(true);
     }
@@ -289,7 +305,8 @@ public class DubboGUI  extends JFrame {
         txtLoadCLass.addItemListener(e -> {
             String clasName = txtLoadCLass.getSelectedItem().toString();
             PlainTextOutput plt = new PlainTextOutput();
-            Decompiler.decompile(clasName, plt);
+
+            Decompiler.decompile(clasName, plt,settings);
             codeArea.setText(plt.toString());
         });
 
@@ -312,8 +329,10 @@ public class DubboGUI  extends JFrame {
 
     public static void main(String[] args) throws Exception {
 
-        new DubboGUI("127.0.0.1", 12345);
+        //new DubboGUI("127.0.0.1", 12345);
+        //attach();
     }
+
 
 
     private void methodStateChanged(ItemEvent e) {

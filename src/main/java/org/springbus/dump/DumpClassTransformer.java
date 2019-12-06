@@ -1,19 +1,21 @@
 package org.springbus.dump;
 
+import javassist.ClassPool;
+import javassist.CtClass;
+
 import java.io.ByteArrayInputStream;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
 
-import javassist.ClassPool;
-import javassist.CtClass;
-
 public class DumpClassTransformer implements ClassFileTransformer {
+
     private static ClassPool pool;
 
     private String packageName;
-    public  DumpClassTransformer(String agentOps) {
-        this.packageName=agentOps;
+
+    public DumpClassTransformer(String agentOps) {
+        this.packageName = agentOps;
     }
 
     static {
@@ -24,21 +26,18 @@ public class DumpClassTransformer implements ClassFileTransformer {
     public byte[] transform(ClassLoader loader, String className, Class<?> classBeingRedefined,
                             ProtectionDomain protectionDomain, byte[] classfileBuffer) throws IllegalClassFormatException {
 
-        String curClassName=className.replace("/", ".");
+        String curClassName = className.replace("/", ".");
         try {
-            if (curClassName.indexOf(packageName)!=-1) {
-                System.out.println(" loading ..." +curClassName);
+            if (curClassName.indexOf(packageName) != -1) {
+                System.out.println(" loading ..." + curClassName);
                 CtClass ctClass = pool.makeClass(new ByteArrayInputStream(classfileBuffer), false);
-                ctClass.writeFile("E:\\agent\\");
+                ctClass.writeFile("./out/");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
-
-
-
 
 
 }
