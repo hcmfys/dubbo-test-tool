@@ -14,8 +14,7 @@ public class DumpClassAgent {
 
         Class<?>[] classes = inst.getAllLoadedClasses();
 
-        for (Class<?> cls : classes)
-        {
+        for (Class<?> cls : classes) {
             System.out.println(cls.getName());
         }
 
