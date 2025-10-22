@@ -89,7 +89,7 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-web</artifactId>
-            <version>3.6.0</version>
+            <version>4.5.22</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.ow2.asm/asm -->
